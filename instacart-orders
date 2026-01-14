@@ -1,0 +1,290 @@
+#!/usr/bin/env python3
+"""
+Instacart order history exporter.
+
+Exports your Instacart orders with full item details to JSON, CSV, or text.
+"""
+
+import argparse
+import csv
+import json
+import sys
+import time
+from datetime import datetime, timedelta
+from typing import Optional
+import requests
+
+
+def parse_instacart_date(date_str: str) -> Optional[datetime]:
+    """Parse Instacart API date format."""
+    formats = [
+        '%b %d, %Y,  %I:%M %p',
+        '%b %d, %Y, %I:%M %p',
+        '%b %d, %Y',
+    ]
+    for fmt in formats:
+        try:
+            return datetime.strptime(date_str.strip(), fmt)
+        except ValueError:
+            continue
+    return None
+
+
+def fetch_orders(session_id: str, since: Optional[datetime] = None,
+                 max_pages: int = 100, verbose: bool = True) -> list:
+    """Fetch orders from Instacart API."""
+
+    headers = {
+        'Host': 'www.instacart.com',
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'X-Client-Identifier': 'web',
+    }
+
+    cookies = {'_instacart_session_id': session_id}
+
+    all_orders = []
+    page = 1
+
+    while page <= max_pages:
+        if verbose:
+            print(f'Fetching page {page}...', file=sys.stderr)
+
+        url = f'https://www.instacart.com/v3/orders?page={page}'
+
+        try:
+            resp = requests.get(url, headers=headers, cookies=cookies, timeout=30)
+
+            if resp.status_code == 429:
+                retry = int(resp.headers.get('Retry-After', 60))
+                if verbose:
+                    print(f'Rate limited. Waiting {retry}s...', file=sys.stderr)
+                time.sleep(retry)
+                continue
+
+            if resp.status_code == 401:
+                print('Error: Invalid or expired session. Get a fresh cookie.', file=sys.stderr)
+                break
+
+            if resp.status_code != 200:
+                print(f'Error: HTTP {resp.status_code}', file=sys.stderr)
+                break
+
+            data = resp.json()
+            orders = data.get('orders', [])
+
+            if not orders:
+                if verbose:
+                    print('No more orders.', file=sys.stderr)
+                break
+
+            # Process orders
+            for order in orders:
+                order_date = parse_instacart_date(order.get('created_at', ''))
+
+                # Stop if we've gone past the since date
+                if since and order_date and order_date < since:
+                    if verbose:
+                        print(f'Reached cutoff date ({since.date()}).', file=sys.stderr)
+                    return all_orders
+
+                order_data = extract_order(order)
+                all_orders.append(order_data)
+
+            if verbose:
+                items = sum(len(i) for o in all_orders for d in o['deliveries'] for i in [d['items']])
+                print(f'  {len(all_orders)} orders, {items} items so far', file=sys.stderr)
+
+            # Check pagination
+            meta = data.get('meta', {}).get('pagination', {})
+            if meta.get('next_page') is None:
+                if verbose:
+                    print('Reached last page.', file=sys.stderr)
+                break
+
+            page += 1
+            time.sleep(0.5)  # Be nice
+
+        except requests.RequestException as e:
+            print(f'Request error: {e}', file=sys.stderr)
+            break
+
+    return all_orders
+
+
+def extract_order(order: dict) -> dict:
+    """Extract relevant fields from API order response."""
+
+    # Parse total
+    total_str = order.get('total', '$0')
+    try:
+        total = float(total_str.replace('$', '').replace(',', ''))
+    except:
+        total = None
+
+    order_data = {
+        'id': order.get('id'),
+        'status': order.get('status'),
+        'total': total,
+        'total_display': order.get('total'),
+        'created_at': order.get('created_at'),
+        'deliveries': []
+    }
+
+    for delivery in order.get('order_deliveries', []):
+        delivery_data = {
+            'retailer': delivery.get('retailer', {}).get('name'),
+            'delivered_at': delivery.get('delivered_at'),
+            'items': []
+        }
+
+        for order_item in delivery.get('order_items', []):
+            item = order_item.get('item', {})
+            delivery_data['items'].append({
+                'name': item.get('name'),
+                'quantity': order_item.get('qty'),
+                'size': item.get('size'),
+                'product_id': item.get('product_id'),
+            })
+
+        order_data['deliveries'].append(delivery_data)
+
+    return order_data
+
+
+def output_json(orders: list, file=sys.stdout):
+    """Output as JSON."""
+    json.dump(orders, file, indent=2)
+    file.write('\n')
+
+
+def output_csv(orders: list, file=sys.stdout):
+    """Output as CSV (flattened items)."""
+    writer = csv.writer(file)
+    writer.writerow(['order_id', 'order_date', 'order_total', 'retailer',
+                     'item_name', 'quantity', 'size', 'product_id'])
+
+    for order in orders:
+        for delivery in order['deliveries']:
+            for item in delivery['items']:
+                writer.writerow([
+                    order['id'],
+                    order['created_at'],
+                    order['total'],
+                    delivery['retailer'],
+                    item['name'],
+                    item['quantity'],
+                    item['size'],
+                    item['product_id'],
+                ])
+
+
+def output_text(orders: list, file=sys.stdout):
+    """Output as human-readable text."""
+    total_spent = sum(o['total'] or 0 for o in orders)
+    total_items = sum(len(i) for o in orders for d in o['deliveries'] for i in [d['items']])
+
+    file.write(f'INSTACART ORDER HISTORY\n')
+    file.write(f'=======================\n')
+    file.write(f'Orders: {len(orders)}\n')
+    file.write(f'Items: {total_items}\n')
+    file.write(f'Total spent: ${total_spent:,.2f}\n\n')
+
+    for order in orders:
+        file.write(f'--- {order["created_at"]} ---\n')
+        file.write(f'Order: {order["id"]}\n')
+        file.write(f'Total: {order["total_display"]}\n')
+
+        for delivery in order['deliveries']:
+            file.write(f'  From: {delivery["retailer"]}\n')
+            for item in delivery['items']:
+                qty = item['quantity'] or 1
+                size = f' ({item["size"]})' if item.get('size') else ''
+                file.write(f'    - {item["name"]}{size} x{qty}\n')
+        file.write('\n')
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description='Export Instacart order history.',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog='''
+Examples:
+  %(prog)s --session "YOUR_COOKIE"                     # All orders as JSON
+  %(prog)s --session "YOUR_COOKIE" --months 6          # Last 6 months
+  %(prog)s --session "YOUR_COOKIE" --format csv        # CSV output
+  %(prog)s --session "YOUR_COOKIE" --since 2024-01-01  # Since date
+
+To get your session cookie:
+  1. Go to instacart.com in Chrome (logged in)
+  2. Open DevTools (Cmd+Option+I / F12)
+  3. Application tab > Cookies > instacart.com
+  4. Copy the value of '_instacart_session_id'
+''')
+
+    parser.add_argument('--session', '-s', required=True,
+                        help='Instacart session cookie value')
+
+    # Date filtering (mutually exclusive)
+    date_group = parser.add_mutually_exclusive_group()
+    date_group.add_argument('--since', type=str,
+                            help='Start date (YYYY-MM-DD)')
+    date_group.add_argument('--months', type=int,
+                            help='Orders from last N months')
+    date_group.add_argument('--days', type=int,
+                            help='Orders from last N days')
+
+    # Output
+    parser.add_argument('--format', '-f', choices=['json', 'csv', 'text'],
+                        default='json', help='Output format (default: json)')
+    parser.add_argument('--output', '-o', type=str,
+                        help='Output file (default: stdout)')
+
+    parser.add_argument('--quiet', '-q', action='store_true',
+                        help='Suppress progress output')
+
+    args = parser.parse_args()
+
+    # Calculate since date
+    since = None
+    if args.since:
+        try:
+            since = datetime.strptime(args.since, '%Y-%m-%d')
+        except ValueError:
+            print(f'Error: Invalid date format. Use YYYY-MM-DD.', file=sys.stderr)
+            sys.exit(1)
+    elif args.months:
+        since = datetime.now() - timedelta(days=args.months * 30)
+    elif args.days:
+        since = datetime.now() - timedelta(days=args.days)
+
+    # Fetch orders
+    orders = fetch_orders(args.session, since=since, verbose=not args.quiet)
+
+    if not orders:
+        print('No orders found.', file=sys.stderr)
+        sys.exit(1)
+
+    # Output
+    output_file = open(args.output, 'w') if args.output else sys.stdout
+
+    try:
+        if args.format == 'json':
+            output_json(orders, output_file)
+        elif args.format == 'csv':
+            output_csv(orders, output_file)
+        elif args.format == 'text':
+            output_text(orders, output_file)
+    finally:
+        if args.output:
+            output_file.close()
+
+    if not args.quiet:
+        total = sum(o['total'] or 0 for o in orders)
+        items = sum(len(i) for o in orders for d in o['deliveries'] for i in [d['items']])
+        print(f'\nExported {len(orders)} orders ({items} items, ${total:,.2f})', file=sys.stderr)
+
+
+if __name__ == '__main__':
+    main()
