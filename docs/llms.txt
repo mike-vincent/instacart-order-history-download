@@ -29,22 +29,22 @@ instacart-scraper -s "YOUR_COOKIE"
 
 ```
 # Export all orders as JSON
-instacart-scraper -s "COOKIE"
+instacart-scraper --session "COOKIE"
 
 # Last 6 months as CSV
-instacart-scraper -s "COOKIE" --months 6 -f csv
+instacart-scraper --session "COOKIE" --months 6 -f csv
 
 # Last 30 days to a file
-instacart-scraper -s "COOKIE" --days 30 -o orders.json
+instacart-scraper --session "COOKIE" --days 30 -o orders.json
 
 # Since January 2024
-instacart-scraper -s "COOKIE" --since 2024-01-01
+instacart-scraper --session "COOKIE" --since 2024-01-01
 
 # Human-readable text output
-instacart-scraper -s "COOKIE" -f text
+instacart-scraper --session "COOKIE" -f text
 
 # Quiet mode (no progress output)
-instacart-scraper -s "COOKIE" -q > orders.json
+instacart-scraper --session "COOKIE" -q > orders.json
 ```
 
 ## Author

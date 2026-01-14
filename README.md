@@ -18,14 +18,14 @@ brew install instacart-scraper
 ## Usage
 
 ```bash
-instacart-scraper -s "YOUR_COOKIE"
-instacart-scraper -s "COOKIE" --months 6 -f csv -o orders.csv
+instacart-scraper --session "YOUR_SESSION_COOKIE"
+instacart-scraper --session "COOKIE" --months 6 -f csv -o orders.csv
 ```
 
 ## Options
 
 ```
--s, --session    Session cookie (required)
+-s, --session    Instacart session cookie from browser (required)
 --months N       Last N months
 --days N         Last N days
 --since DATE     Since YYYY-MM-DD
