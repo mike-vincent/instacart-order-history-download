@@ -229,7 +229,7 @@ To get your session cookie:
   3. Copy value of '_instacart_session_id'
 ''')
 
-    parser.add_argument('--instacart-session-id', required=True,
+    parser.add_argument('--instacart-session-id', '-instacart-session-id', required=True,
                         help='Your _instacart_session_id cookie value')
 
     date_group = parser.add_mutually_exclusive_group()
