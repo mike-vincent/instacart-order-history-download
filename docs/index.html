@@ -10,10 +10,8 @@
             --fg: #ededed;
             --muted: #a3a3a3;
             --subtle: #737373;
-            --pre-bg: #171717;
             --pre-border: #262626;
             --hr: #262626;
-            --shadow: rgba(0,0,0,0.2);
         }
         * { box-sizing: border-box; }
         body {
@@ -33,10 +31,11 @@
             margin-bottom: 32px;
         }
         h2 {
+            font-family: "SF Mono", Menlo, Monaco, monospace;
             font-size: 14px;
-            font-weight: 600;
+            font-weight: 400;
             margin: 0 0 10px;
-            color: var(--fg);
+            color: var(--muted);
         }
         p {
             color: var(--muted);
@@ -44,29 +43,22 @@
             font-size: 15px;
         }
         pre {
-            background: var(--pre-bg);
+            background: var(--bg);
             border: 1px solid var(--pre-border);
             padding: 14px 16px;
-            border-radius: 8px;
             font-size: 13px;
             overflow-x: auto;
             margin: 14px 0 0;
-            box-shadow: 0 1px 3px var(--shadow);
         }
         code {
             font-family: "SF Mono", Menlo, Monaco, monospace;
             font-size: 13px;
         }
         p code {
-            background: var(--pre-bg);
+            background: var(--bg);
+            border: 1px solid var(--pre-border);
             padding: 2px 6px;
-            border-radius: 4px;
             font-size: 12px;
-        }
-        hr {
-            border: none;
-            border-top: 1px solid var(--hr);
-            margin: 32px 0;
         }
         section {
             margin-bottom: 0;
@@ -93,37 +85,54 @@
         .footer a:hover {
             color: var(--muted);
         }
+        .copy-btn {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            background: var(--bg);
+            border: 1px solid var(--pre-border);
+            color: var(--muted);
+            font-family: "SF Mono", Menlo, Monaco, monospace;
+            font-size: 12px;
+            padding: 6px 12px;
+            cursor: pointer;
+            transition: color 0.15s ease;
+        }
+        .copy-btn:hover {
+            color: var(--fg);
+        }
     </style>
 </head>
 <body>
+    <button class="copy-btn" onclick="copyMarkdown()">Copy Markdown</button>
     <h1>instacart-order-history-download</h1>
-    <p style="margin-top:-24px;margin-bottom:32px;">Download Your Instacart Receipts</p>
+    <p style="margin-top:-24px;margin-bottom:32px;color:var(--muted);font-family:'SF Mono',Menlo,Monaco,monospace;font-size:14px;">## Download Your Instacart Receipts</p>
 
     <pre><code>instacart-order-history-download \
   --instacart-session-id "WlhsS05XTXpTVzFrVjFaNlRETkNkR0ZKUW5OaFYwNXNZM2xCYVZwWVNqLS1LUlZ5UHVaUXVkbzZ2dEpsU29qU2ZnPT0tLTQ4MTY1YmM1N2ZhYmUwZWU1MGYxZDAxNjIxMTM2ZGExOTZmOGYyYTE="</code></pre>
 
 
     <section>
-        <h2>Find Your Instacart Session ID</h2>
+        <h2>## Find Your Instacart Session ID</h2>
         <p>Log into instacart.com, open your browser DevTools, go to Cookies, and copy the value of <code>_instacart_session_id</code>.</p>
     </section>
 
 
     <section>
-        <h2>Homebrew</h2>
+        <h2>## Homebrew</h2>
         <pre><code>brew tap mike-vincent/instacart-order-history-download
 brew install instacart-order-history-download</code></pre>
     </section>
 
 
     <section>
-        <h2>MacPorts</h2>
+        <h2>## MacPorts</h2>
         <pre><code>sudo port install instacart-order-history-download</code></pre>
     </section>
 
 
     <section>
-        <h2>Build from source</h2>
+        <h2>## Build from source</h2>
         <pre><code>git clone https://github.com/mike-vincent/instacart-order-history-download.git
 cd instacart-order-history-download
 chmod +x instacart-order-history-download</code></pre>
@@ -133,5 +142,48 @@ chmod +x instacart-order-history-download</code></pre>
         Not affiliated with Maplebear Inc. d/b/a Instacart.<br><br>
         Copyright © 2026 <a href="https://www.mikevincent.dev">Mike Vincent</a>, Los Angeles, Calif. All Rights Reserved.
     </div>
+
+    <script>
+    function copyMarkdown() {
+        const md = `# instacart-order-history-download
+
+Download Your Instacart Receipts
+
+\`\`\`
+instacart-order-history-download \\
+  --instacart-session-id "YOUR_SESSION_ID"
+\`\`\`
+
+## Find Your Instacart Session ID
+
+Log into instacart.com, open your browser DevTools, go to Cookies, and copy the value of \`_instacart_session_id\`.
+
+## Homebrew
+
+\`\`\`
+brew tap mike-vincent/instacart-order-history-download
+brew install instacart-order-history-download
+\`\`\`
+
+## MacPorts
+
+\`\`\`
+sudo port install instacart-order-history-download
+\`\`\`
+
+## Build from source
+
+\`\`\`
+git clone https://github.com/mike-vincent/instacart-order-history-download.git
+cd instacart-order-history-download
+chmod +x instacart-order-history-download
+\`\`\`
+`;
+        navigator.clipboard.writeText(md);
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Markdown', 1500);
+    }
+    </script>
 </body>
 </html>
