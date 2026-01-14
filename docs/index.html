@@ -142,10 +142,10 @@ chmod +x instacart-order-history-fetch
 instacart-order-history-fetch \
   --instacart-session-id "abc123..."
 
-# Fetch last 6 months to CSV
+# Fetch last 10 orders as CSV
 instacart-order-history-fetch \
   --instacart-session-id "abc123..." \
-  --months 6 -f csv
+  -n 10 -f csv
 
 # Fetch to file
 instacart-order-history-fetch \
