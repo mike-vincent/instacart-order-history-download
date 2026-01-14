@@ -31,11 +31,10 @@
             margin-bottom: 32px;
         }
         h2 {
-            font-family: "SF Mono", Menlo, Monaco, monospace;
-            font-size: 14px;
-            font-weight: 400;
-            margin: 0 0 10px;
-            color: var(--muted);
+            font-size: 15px;
+            font-weight: 600;
+            margin: 32px 0 10px;
+            color: var(--fg);
         }
         p {
             color: var(--muted);
@@ -85,110 +84,31 @@
         .footer a:hover {
             color: var(--muted);
         }
-        .copy-btn {
-            position: fixed;
-            top: 24px;
-            right: 24px;
-            background: var(--bg);
-            border: 1px solid var(--pre-border);
-            color: var(--muted);
-            font-family: "SF Mono", Menlo, Monaco, monospace;
-            font-size: 12px;
-            padding: 6px 12px;
-            cursor: pointer;
-            transition: color 0.15s ease;
-        }
-        .copy-btn:hover {
-            color: var(--fg);
-        }
     </style>
 </head>
 <body>
-    <button class="copy-btn" onclick="copyMarkdown()">Copy Markdown</button>
     <h1>instacart-order-history-download</h1>
     <p style="margin-top:-24px;margin-bottom:32px;">A command-line tool to download your Instacart order history.</p>
 
     <section>
-        <h2>## Find Your Instacart Session ID</h2>
-        <p>Log into instacart.com, open your browser DevTools, go to Cookies, and copy the value of <code>_instacart_session_id</code>.</p>
+        <h2>Install</h2>
+        <pre><code>brew install mike-vincent/tap/instacart-order-history-download</code></pre>
     </section>
 
     <section>
-        <h2>## Download Your Instacart Receipts</h2>
+        <h2>Find Your Session ID</h2>
+        <p>Log into instacart.com, open DevTools, go to Cookies, and copy the value of <code>_instacart_session_id</code>.</p>
+    </section>
+
+    <section>
+        <h2>Download Your Receipts</h2>
         <pre><code>instacart-order-history-download \
-  --instacart-session-id "VG9rZW5FeGFtcGxlQmFzZTY0RW5jb2RlZFNlc3Npb25JZC0tYWJjMTIzZGVmNDU2Z2hpNzg5PT0tLTEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWYwMTIzNDU2Nzg5YWJjZGVm"</code></pre>
-    </section>
-
-
-    <section>
-        <h2>## Homebrew</h2>
-        <pre><code>brew tap mike-vincent/instacart-order-history-download
-brew install instacart-order-history-download</code></pre>
-    </section>
-
-
-    <section>
-        <h2>## MacPorts</h2>
-        <pre><code>sudo port install instacart-order-history-download</code></pre>
-    </section>
-
-
-    <section>
-        <h2>## Build from source</h2>
-        <pre><code>git clone https://github.com/mike-vincent/instacart-order-history-download.git
-cd instacart-order-history-download
-chmod +x instacart-order-history-download</code></pre>
+  --instacart-session-id "YOUR_SESSION_ID"</code></pre>
     </section>
 
     <div class="footer">
         Not affiliated with Maplebear Inc. d/b/a Instacart.<br><br>
         Copyright © 2026 <a href="https://www.mikevincent.dev">Mike Vincent</a>, Los Angeles, Calif. All Rights Reserved.
     </div>
-
-    <script>
-    function copyMarkdown() {
-        const lines = [
-            '# instacart-order-history-download',
-            '',
-            'A command-line tool to download your Instacart order history.',
-            '',
-            '## Find Your Instacart Session ID',
-            '',
-            'Log into instacart.com, open your browser DevTools, go to Cookies, and copy the value of `_instacart_session_id`.',
-            '',
-            '## Download Your Instacart Receipts',
-            '',
-            '```',
-            'instacart-order-history-download \\',
-            '  --instacart-session-id "YOUR_SESSION_ID"',
-            '```',
-            '',
-            '## Homebrew',
-            '',
-            '```',
-            'brew tap mike-vincent/instacart-order-history-download',
-            'brew install instacart-order-history-download',
-            '```',
-            '',
-            '## MacPorts',
-            '',
-            '```',
-            'sudo port install instacart-order-history-download',
-            '```',
-            '',
-            '## Build from source',
-            '',
-            '```',
-            'git clone https://github.com/mike-vincent/instacart-order-history-download.git',
-            'cd instacart-order-history-download',
-            'chmod +x instacart-order-history-download',
-            '```'
-        ];
-        navigator.clipboard.writeText(lines.join('\n'));
-        const btn = document.querySelector('.copy-btn');
-        btn.textContent = 'Copied!';
-        setTimeout(() => btn.textContent = 'Copy Markdown', 1500);
-    }
-    </script>
 </body>
 </html>
