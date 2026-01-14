@@ -19,20 +19,18 @@ brew install instacart-order-history-fetch
 
 ```bash
 instacart-order-history-fetch --instacart-session-id "YOUR_SESSION_ID"
-instacart-order-history-fetch --instacart-session-id "YOUR_SESSION_ID" --months 6 -f csv -o orders.csv
+instacart-order-history-fetch --instacart-session-id "YOUR_SESSION_ID" -n 10 -f csv -o orders.csv
 ```
 
 ## Options
 
 ```
---instacart-session-id, --instacart-session-id     Your _instacart_session_id cookie (required)
---months N       Last N months
---days N         Last N days
---since DATE     Since YYYY-MM-DD
--f, --format     csv, json, markdown, tsv, or yaml
--o, --output     Output file
--q, --quiet      Quiet mode
--h, --help       Show help
+--instacart-session-id   Your _instacart_session_id cookie (required)
+-n, --orders             Number of orders to fetch (default: all)
+-f, --format             csv, json, markdown, tsv, or yaml
+-o, --output             Output file
+-q, --quiet              Quiet mode
+-h, --help               Show help
 ```
 
 ## Output
