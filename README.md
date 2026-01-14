@@ -39,7 +39,7 @@ JSON, CSV, or text with order dates, totals, retailers, and full item details.
 
 ## Author
 
-[Mike Vincent](https://www.mikevincent.dev), Los Angeles
+[Mike Vincent](https://www.mikevincent.dev), Los Angeles, Calif.
 
 ## Disclaimer
 

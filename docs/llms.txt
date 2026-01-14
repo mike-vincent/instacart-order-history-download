@@ -49,7 +49,7 @@ instacart-order-history-download --instacart-session-id "YOUR_SESSION_ID" -q > o
 
 ## Author
 
-Mike Vincent
+Mike Vincent, Los Angeles, Calif.
 https://www.mikevincent.dev
 https://github.com/mike-vincent
 
