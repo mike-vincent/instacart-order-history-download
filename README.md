@@ -1,4 +1,4 @@
-# instacart-order-history-scraper
+# instacart-orders
 
 Fetch your Instacart order history. One thing, done well.
 
@@ -7,13 +7,13 @@ No dependencies. Just Python 3 (pre-installed on macOS/Linux).
 ## Install
 
 ```bash
-curl -o /usr/local/bin/instacart-orders https://raw.githubusercontent.com/mike-vincent/instacart-order-history-scraper/master/instacart-orders
+curl -o /usr/local/bin/instacart-orders https://raw.githubusercontent.com/mike-vincent/instacart-orders/master/instacart-orders
 chmod +x /usr/local/bin/instacart-orders
 ```
 
 Or clone:
 ```bash
-git clone https://github.com/mike-vincent/instacart-order-history-scraper.git
+git clone https://github.com/mike-vincent/instacart-orders.git
 ```
 
 ## Get Your Session Cookie

@@ -9,7 +9,7 @@ instacart-orders exports your Instacart order history to JSON, CSV, or text. ins
 Install instacart-orders with Homebrew:
 
 ```
-brew tap mike-vincent/instacart-order-history-scraper
+brew tap mike-vincent/instacart-orders
 brew install instacart-orders
 ```
 
@@ -55,7 +55,7 @@ https://github.com/mike-vincent
 
 ## Source
 
-https://github.com/mike-vincent/instacart-order-history-scraper
+https://github.com/mike-vincent/instacart-orders
 
 ## License
 
